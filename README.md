@@ -14,22 +14,25 @@ go install github.com/happybydefault/edb-image-rotation-assignment/cmd/pbmrotate
 ## Run
 
 ```sh
-pbmrotate [OPTIONS] FILE
+pbmrotate -h
 ```
 
 ```
+Usage: pbmrotate [OPTIONS] FILE
+
 Options:
-    -d      Degrees (counterclockwise if negative)
+    -d      Number of degrees; counterclockwise if negative (default 90)
+    -h      Print help
 ```
 
 ### Examples
 
 ```sh
-# Rotate an image 90° clockwise
-pbmrotate -d 90 example-image.pbm
+# Rotate an image 270° clockwise
+pbmrotate -d 270 example-image.pbm
 
-# Rotate an image 270° counterclockwise
-pbmrotate -d -270 example-image.pbm
+# Rotate an image 90° counterclockwise
+pbmrotate -d 90 -r example-image.pbm
 ```
 
 ## Docker
