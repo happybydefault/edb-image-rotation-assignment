@@ -8,9 +8,7 @@ import (
 )
 
 func TestFlip(t *testing.T) {
-	image := `P1
-# This is an example bitmap of the letter "J"
-6 10
+	image := []byte(`6 10
 0 0 0 0 1 0
 0 0 0 0 1 0
 0 0 0 0 1 0
@@ -21,43 +19,43 @@ func TestFlip(t *testing.T) {
 0 1 1 1 0 0
 0 0 0 0 0 0
 0 0 0 0 0 0
-`
-	imageCW90 := `P1
-# This is an example bitmap of the letter "J"
-10 6
+`)
+	imageCW90 := []byte(`10 6
 0 0 0 1 0 0 0 0 0 0
 0 0 1 0 0 0 0 0 0 0
 0 0 1 0 0 0 0 0 0 0
 0 0 1 0 0 0 0 0 0 0
 0 0 0 1 1 1 1 1 1 1
 0 0 0 0 0 0 0 0 0 0
-`
+`)
 
 	type args struct {
-		r       io.Reader
+		image   io.Reader
 		degrees int
+		ccw     bool
 	}
 
 	tests := []struct {
 		name    string
 		args    args
-		want    io.Reader
+		want    []byte
 		wantErr bool
 	}{
 		{
 			name: "assignment example, 90 degrees clockwise",
 			args: args{
-				r:       bytes.NewReader([]byte(image)),
+				image:   bytes.NewReader(image),
 				degrees: 90,
+				ccw:     false,
 			},
-			want:    bytes.NewReader([]byte(imageCW90)),
+			want:    imageCW90,
 			wantErr: false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := Flip(test.args.r, test.args.degrees)
+			got, err := Flip(test.args.image, test.args.degrees, test.args.ccw)
 			if (err != nil) != test.wantErr {
 				t.Errorf("Flip() error = %v, wantErr %v", err, test.wantErr)
 				return
