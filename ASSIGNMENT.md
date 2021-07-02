@@ -10,7 +10,8 @@ number of degrees.
 
 ## PBM
 
-PBM is an image format that can be represented in ascii and is easily manipulated.
+[PBM](https://en.wikipedia.org/wiki/Netpbm) is an image format that can be represented in ascii and is easily
+manipulated.
 
 An example pbm file could look like this:
 
