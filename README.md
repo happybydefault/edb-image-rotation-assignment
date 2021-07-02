@@ -21,7 +21,8 @@ pbmrotate -h
 Usage: pbmrotate [OPTIONS] FILE
 
 Options:
-    -d      Number of degrees; counterclockwise if negative (default 90)
+    -d      Number of degrees (default 90)
+    -r      Counterclockwise
     -h      Print help
 ```
 
