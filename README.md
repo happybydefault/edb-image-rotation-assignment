@@ -28,10 +28,10 @@ Options:
 ### Examples
 
 ```sh
-# Rotate an image 270° clockwise
+# Rotate an image 270 degrees clockwise
 pbmrotate -d 270 example-image.pbm
 
-# Rotate an image 90° counterclockwise
+# Rotate an image 90 degrees counterclockwise
 pbmrotate -d 90 -r example-image.pbm
 ```
 
