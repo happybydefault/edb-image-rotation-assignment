@@ -19,8 +19,7 @@ pbmrotate [OPTIONS] FILE
 
 ```
 Options:
-    -d      Degrees
-    -r      Reverse (counterclockwise)
+    -d      Degrees (counterclockwise if negative)
 ```
 
 ### Examples
@@ -30,7 +29,7 @@ Options:
 pbmrotate -d 90 example-image.pbm
 
 # Rotate an image 270° counterclockwise
-pbmrotate -d 270 -r example-image.pbm
+pbmrotate -d -270 example-image.pbm
 ```
 
 ## Docker
