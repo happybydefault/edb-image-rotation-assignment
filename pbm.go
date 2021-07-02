@@ -7,11 +7,11 @@ import (
 	"io"
 )
 
-// Flip rotates an image with a degrees that's a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
+// Flip returns the rotated image of an ASCII encoded PBM. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
 // returns a non-nil error.
-func Flip(r io.Reader, degrees int) (io.Reader, error) {
+func Flip(r io.Reader, degrees int, ccw bool) ([]byte, error) {
 	if r == nil {
-		return nil, errors.New("reader is nil")
+		return nil, errors.New("image is nil")
 	}
 
 	quarterTurn := 90
@@ -19,5 +19,10 @@ func Flip(r io.Reader, degrees int) (io.Reader, error) {
 		return nil, fmt.Errorf("number of degrees is not multiple of a quarter turn")
 	}
 
-	return r, nil
+	b, err := io.ReadAll(r)
+	if err != nil {
+		return nil, fmt.Errorf("could not read image: %w", err)
+	}
+
+	return b, nil
 }
