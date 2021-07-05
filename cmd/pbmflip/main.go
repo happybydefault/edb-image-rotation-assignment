@@ -53,6 +53,7 @@ func run(filename string, degrees int, ccw bool) error {
 	if err != nil {
 		return fmt.Errorf("could not open file %q: %w", filename, err)
 	}
+	defer file.Close()
 
 	result, err := pbm.Flip(file, degrees, ccw)
 	if err != nil {
