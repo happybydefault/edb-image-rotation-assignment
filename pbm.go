@@ -72,8 +72,22 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	log.Printf("width: %d, height: %d", width, height)
 
 	// TODO
-	fmt.Fprintln(output, string(magicNumASCII))
-	fmt.Fprint(output, comments)
+
+	_, err = fmt.Fprintln(output, string(magicNumASCII))
+	if err != nil {
+		return fmt.Errorf("could not write to output: %w", err)
+	}
+
+	_, err = fmt.Fprint(output, comments)
+	if err != nil {
+		return fmt.Errorf("could not write to output: %w", err)
+	}
+
+	_, err = fmt.Fprintln(output, sizeStr)
+	if err != nil {
+		return fmt.Errorf("could not write to output: %w", err)
+	}
+
 	_, err = fmt.Fprintln(output, "# Flipped")
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
