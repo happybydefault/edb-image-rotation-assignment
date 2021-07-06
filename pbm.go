@@ -36,8 +36,10 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return fmt.Errorf("magic number does not correspond to an ASCII PBM file: %w", err)
 	}
 
-	var sizeStr string
-	comments := &bytes.Buffer{}
+	var (
+		sizeStr  string
+		comments = &bytes.Buffer{}
+	)
 	for {
 		s, err := r.ReadString('\n')
 		if err != nil {
@@ -72,7 +74,6 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	log.Printf("width: %d, height: %d", width, height)
 
 	// TODO
-
 	_, err = fmt.Fprintln(output, string(magicNumASCII))
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
