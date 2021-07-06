@@ -3,6 +3,7 @@ package pbm
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -10,6 +11,8 @@ import (
 	"strconv"
 	"strings"
 )
+
+var magicNumASCII = []byte("P1")
 
 // Flip writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
 // returns a non-nil error.
@@ -24,12 +27,28 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	}
 
 	r := bufio.NewReader(image)
-
-	sizeStr, err := r.ReadString('\n')
+	magicNum := make([]byte, 2)
+	_, err := r.Read(magicNum)
 	if err != nil {
-		return fmt.Errorf("could not read string: %w", err)
+		return fmt.Errorf("could not read magic number: %w", err)
 	}
-	sizeStr = strings.TrimSuffix(sizeStr, "\n")
+	if !bytes.Equal(magicNum, magicNumASCII) {
+		return fmt.Errorf("magic number does not correspond to an ASCII PBM file: %w", err)
+	}
+
+	var sizeStr string
+	for {
+		s, err := r.ReadString('\n')
+		if err != nil {
+			return fmt.Errorf("could not read string: %w", err)
+		}
+		s = strings.TrimSpace(s)
+
+		if s != "" && !strings.HasPrefix(s, "#") {
+			sizeStr = s
+			break
+		}
+	}
 
 	size := strings.Split(sizeStr, " ")
 	if len(size) < 2 {
@@ -40,22 +59,21 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	if err != nil {
 		return fmt.Errorf("invalid width: %w", err)
 	}
-
 	height, err := strconv.Atoi(size[1])
 	if err != nil {
 		return fmt.Errorf("invalid height: %w", err)
 	}
-
 	log.Printf("width: %d, height: %d", width, height)
 
 	// TODO
-	_, err = io.Copy(output, image)
-	if err != nil {
-		return fmt.Errorf("could not copy: %w", err)
-	}
+	fmt.Fprintln(output, string(magicNumASCII))
 	_, err = fmt.Fprintln(output, "# Flipped")
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
+	}
+	_, err = io.Copy(output, r)
+	if err != nil {
+		return fmt.Errorf("could not copy: %w", err)
 	}
 
 	return nil
