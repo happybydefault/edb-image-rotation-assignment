@@ -74,6 +74,7 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	log.Printf("width: %d, height: %d", width, height)
 
 	// TODO
+
 	_, err = fmt.Fprintln(output, string(magicNumASCII))
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
@@ -89,15 +90,37 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
-	_, err = fmt.Fprintln(output, sizeStr)
+	_, err = fmt.Fprintln(output, height, width)
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
-	_, err = io.Copy(output, r)
-	if err != nil {
-		return fmt.Errorf("could not copy: %w", err)
+	matrix := make([][]byte, width)
+	for i := range matrix {
+		matrix[i] = make([]byte, height)
 	}
+
+	for {
+		b, err := r.ReadByte()
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return fmt.Errorf("could not read byte: %w", err)
+		}
+
+		space := false
+		switch b {
+		case ' ', '\t', '\n', '\r':
+			space = true
+		}
+		if space {
+			continue
+		}
+
+		// TODO
+	}
+	log.Printf("%+v", matrix)
 
 	return nil
 }
