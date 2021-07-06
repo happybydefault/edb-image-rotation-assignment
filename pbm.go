@@ -83,15 +83,16 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
+	_, err = fmt.Fprintln(output, "# Flipped")
+	if err != nil {
+		return fmt.Errorf("could not write to output: %w", err)
+	}
+
 	_, err = fmt.Fprintln(output, sizeStr)
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
-	_, err = fmt.Fprintln(output, "# Flipped")
-	if err != nil {
-		return fmt.Errorf("could not write to output: %w", err)
-	}
 	_, err = io.Copy(output, r)
 	if err != nil {
 		return fmt.Errorf("could not copy: %w", err)
