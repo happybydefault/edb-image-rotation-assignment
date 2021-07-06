@@ -73,6 +73,7 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 
 	// TODO
 	fmt.Fprintln(output, string(magicNumASCII))
+	fmt.Fprint(output, comments)
 	_, err = fmt.Fprintln(output, "# Flipped")
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
