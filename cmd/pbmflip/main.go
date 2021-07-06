@@ -95,7 +95,7 @@ func run(filenameIn string, filenameOut string, degrees int, ccw bool) error {
 
 	err = pbm.Flip(fileOut, fileIn, degrees, ccw)
 	if err != nil {
-		return fmt.Errorf("could flip image: %w", err)
+		return fmt.Errorf("could not flip image: %w", err)
 	}
 
 	return nil
