@@ -37,6 +37,7 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	}
 
 	var sizeStr string
+	comments := &bytes.Buffer{}
 	for {
 		s, err := r.ReadString('\n')
 		if err != nil {
@@ -44,7 +45,12 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		}
 		s = strings.TrimSpace(s)
 
-		if s != "" && !strings.HasPrefix(s, "#") {
+		if s == "" {
+			continue
+		} else if strings.HasPrefix(s, "#") {
+			fmt.Fprintln(comments, s)
+			continue
+		} else {
 			sizeStr = s
 			break
 		}
