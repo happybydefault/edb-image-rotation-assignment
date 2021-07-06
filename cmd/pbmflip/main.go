@@ -1,76 +1,102 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
-	"strings"
 
 	pbm "github.com/happybydefault/edb-image-rotation-assignment"
 )
 
 func main() {
-	f := flag.NewFlagSet("pbmflip", flag.ExitOnError)
+	var (
+		printHelp bool
 
-	var printHelp bool
-	var ccw bool
-	var degrees int
+		degrees     int
+		ccw         bool
+		filenameOut string
+	)
 
-	f.BoolVar(&printHelp, "h", false, "Print help")
-	f.IntVar(&degrees, "d", 90, "Number of degrees")
-	f.BoolVar(&ccw, "r", false, "Counterclockwise")
+	flagSet := flag.NewFlagSet("pbmflip", flag.ExitOnError)
 
-	f.Usage = func() {
-		fmt.Fprintf(f.Output(), "\nUsage: %s [OPTIONS] FILE\n\nOptions:\n", f.Name())
-		f.PrintDefaults()
+	flagSet.BoolVar(&printHelp, "h", false, "Print help")
+
+	flagSet.IntVar(&degrees, "d", 90, "Number of degrees. Possible values are only 90, 180, and 270")
+	flagSet.BoolVar(&ccw, "c", false, "Counterclockwise")
+	flagSet.StringVar(&filenameOut, "o", "", "Write to file instead of stdout")
+
+	flagSet.Usage = func() {
+		fmt.Fprintf(flagSet.Output(), "\nUsage: %s [OPTIONS] FILE\n\nOptions:\n", flagSet.Name())
+		flagSet.PrintDefaults()
 	}
 
 	// on error, it executes flag set Usage() and exists (because of flag.ExitOnError)
-	f.Parse(os.Args[1:])
+	flagSet.Parse(os.Args[1:])
 
 	if printHelp {
-		f.SetOutput(os.Stdout)
-		f.Usage()
-		return
+		flagSet.SetOutput(os.Stdout)
+		flagSet.Usage()
+		os.Exit(0)
 	}
 
-	filename := f.Arg(0)
-	if filename == "" {
-		f.Usage()
-		os.Exit(2)
-	}
+	filenameIn := flagSet.Arg(0)
 
-	err := run(filename, degrees, ccw)
+	err := run(filenameIn, filenameOut, degrees, ccw)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
 }
 
-func run(filename string, degrees int, ccw bool) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return fmt.Errorf("could not open file %q: %w", filename, err)
-	}
-	defer file.Close()
+func run(filenameIn string, filenameOut string, degrees int, ccw bool) error {
+	var (
+		fileIn  io.Reader
+		fileOut io.Writer
+	)
 
-	result, err := pbm.Flip(file, degrees, ccw)
+	stdinInfo, err := os.Stdin.Stat()
+	if err != nil {
+		return fmt.Errorf("could not get stats from stdin: %w", err)
+	}
+
+	pipe := stdinInfo.Mode()&os.ModeNamedPipe == os.ModeNamedPipe
+	if pipe {
+		fileIn = os.Stdin
+	} else if filenameIn == "" || filenameIn == "-" {
+		buf := &bytes.Buffer{}
+		_, err := buf.ReadFrom(os.Stdin)
+		if err != nil {
+			return fmt.Errorf("could not read from stdin: %w", err)
+		}
+		fileIn = buf
+	} else {
+		f, err := os.Open(filenameIn)
+		if err != nil {
+			log.Printf("could not open file %q: %s", filenameIn, err)
+			os.Exit(1)
+		}
+		defer f.Close()
+		fileIn = f
+	}
+
+	if filenameOut == "" {
+		fileOut = os.Stdout
+	} else {
+		f, err := os.Create(filenameOut)
+		if err != nil {
+			return fmt.Errorf("could not copy to file %q: %w", filenameOut, err)
+		}
+		defer f.Close()
+		fileOut = f
+	}
+
+	err = pbm.Flip(fileOut, fileIn, degrees, ccw)
 	if err != nil {
 		return fmt.Errorf("could flip image: %w", err)
 	}
-
-	direction := "cw"
-	if ccw {
-		direction = "ccw"
-	}
-	name := fmt.Sprintf("%s-%s%d.pbm", strings.TrimSuffix(filename, ".pbm"), direction, degrees)
-
-	err = os.WriteFile(name, result, 0644)
-	if err != nil {
-		return fmt.Errorf("could not write to file %q: %w", name, err)
-	}
-	log.Printf("created file %q", name)
 
 	return nil
 }

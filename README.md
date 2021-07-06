@@ -22,7 +22,7 @@ Usage: pbmrotate [OPTIONS] FILE
 
 Options:
     -d      Number of degrees (default 90)
-    -r      Counterclockwise
+    -c      Counterclockwise
     -h      Print help
 ```
 
