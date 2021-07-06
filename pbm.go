@@ -63,15 +63,15 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return errors.New("invalid size string")
 	}
 
-	width, err := strconv.Atoi(size[0])
+	originalWidth, err := strconv.Atoi(size[0])
 	if err != nil {
 		return fmt.Errorf("invalid width: %w", err)
 	}
-	height, err := strconv.Atoi(size[1])
+	originalHeight, err := strconv.Atoi(size[1])
 	if err != nil {
 		return fmt.Errorf("invalid height: %w", err)
 	}
-	log.Printf("width: %d, height: %d", width, height)
+	log.Printf("width: %d, height: %d", originalWidth, originalHeight)
 
 	// TODO
 
@@ -90,16 +90,18 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
-	_, err = fmt.Fprintln(output, height, width)
+	_, err = fmt.Fprintln(output, originalHeight, originalWidth)
 	if err != nil {
 		return fmt.Errorf("could not write to output: %w", err)
 	}
 
-	matrix := make([][]byte, width)
+	width, height := originalHeight, originalWidth
+	matrix := make([][]byte, height)
 	for i := range matrix {
-		matrix[i] = make([]byte, height)
+		matrix[i] = make([]byte, width)
 	}
 
+	var count int
 	for {
 		b, err := r.ReadByte()
 		if err != nil {
@@ -119,6 +121,11 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		}
 
 		// TODO
+		originalX := count % originalWidth
+		originalY := count / originalWidth
+		log.Println(originalX, originalY)
+
+		count++
 	}
 	log.Printf("%+v", matrix)
 
