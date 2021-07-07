@@ -15,9 +15,9 @@ func main() {
 	var (
 		printHelp bool
 
-		degrees     int
-		ccw         bool
-		filenameOut string
+		degrees    int
+		ccw        bool
+		resultName string
 	)
 
 	flagSet := flag.NewFlagSet("pbmrotate", flag.ExitOnError)
@@ -26,14 +26,16 @@ func main() {
 
 	flagSet.IntVar(&degrees, "d", 90, "Number of degrees. Possible values are only 90, 180, and 270")
 	flagSet.BoolVar(&ccw, "c", false, "Counterclockwise")
-	flagSet.StringVar(&filenameOut, "o", "", "Write the result to file instead of stdout")
+	flagSet.StringVar(&resultName, "o", "", "Write the result to file instead of stdout")
 
 	flagSet.Usage = func() {
-		fmt.Fprintf(flagSet.Output(), "\nUsage: %s [OPTIONS] FILE\n\nOptions:\n", flagSet.Name())
+		fmt.Fprintf(flagSet.Output(), "\nUsage: %s [OPTIONS] FILE\n\nOptions:\n\n", flagSet.Name())
 		flagSet.PrintDefaults()
+		fmt.Fprint(flagSet.Output(), "\n")
+		printExamples(flagSet.Output())
 	}
 
-	// on error, it executes flag set Usage() and exits (because of flag.ExitOnError)
+	// On error, it executes flag set's Usage() and exits, because of flag.ExitOnError
 	flagSet.Parse(os.Args[1:])
 
 	if printHelp {
@@ -42,19 +44,19 @@ func main() {
 		os.Exit(0)
 	}
 
-	filenameIn := flagSet.Arg(0)
+	inputName := flagSet.Arg(0)
 
-	err := run(filenameIn, filenameOut, degrees, ccw)
+	err := run(inputName, resultName, degrees, ccw)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
 	}
 }
 
-func run(filenameIn string, filenameOut string, degrees int, ccw bool) error {
+func run(inputName string, resultName string, degrees int, ccw bool) error {
 	var (
-		fileIn  io.Reader
-		fileOut io.Writer
+		r io.Reader
+		w io.Writer
 	)
 
 	stdinInfo, err := os.Stdin.Stat()
@@ -62,41 +64,54 @@ func run(filenameIn string, filenameOut string, degrees int, ccw bool) error {
 		return fmt.Errorf("could not get stats from stdin: %w", err)
 	}
 
-	pipe := stdinInfo.Mode()&os.ModeNamedPipe == os.ModeNamedPipe
-	if pipe {
-		fileIn = os.Stdin
-	} else if filenameIn == "" || filenameIn == "-" {
+	isPipe := stdinInfo.Mode()&os.ModeNamedPipe == os.ModeNamedPipe
+	if isPipe {
+		r = os.Stdin
+	} else if inputName == "" || inputName == "-" {
 		buf := &bytes.Buffer{}
 		_, err := buf.ReadFrom(os.Stdin)
 		if err != nil {
 			return fmt.Errorf("could not read from stdin: %w", err)
 		}
-		fileIn = buf
+		r = buf
 	} else {
-		f, err := os.Open(filenameIn)
+		f, err := os.Open(inputName)
 		if err != nil {
-			log.Printf("could not open file %q: %s", filenameIn, err)
-			os.Exit(1)
+			return fmt.Errorf("could not open file %q: %s", inputName, err)
 		}
 		defer f.Close()
-		fileIn = f
+		r = f
 	}
 
-	if filenameOut == "" {
-		fileOut = os.Stdout
+	if resultName == "" {
+		w = os.Stdout
 	} else {
-		f, err := os.Create(filenameOut)
+		f, err := os.Create(resultName)
 		if err != nil {
-			return fmt.Errorf("could not copy to file %q: %w", filenameOut, err)
+			return fmt.Errorf("could not copy to file %q: %w", resultName, err)
 		}
 		defer f.Close()
-		fileOut = f
+		w = f
 	}
 
-	err = pbm.Rotate(fileOut, fileIn, degrees, ccw)
+	err = pbm.Rotate(w, r, degrees, ccw)
 	if err != nil {
 		return fmt.Errorf("could not rotate image: %w", err)
 	}
 
 	return nil
+}
+
+func printExamples(w io.Writer) error {
+	examples := `# Rotate an image 270 degrees clockwise and write the result to a file
+pbmrotate -d=270 -o="example-image-rotated.pbm" example-image.pbm
+
+# Rotate an image 90 degrees counterclockwise and write the result to stdout
+pbmrotate -d=90 -c example-image.pbm
+
+# Rotate an image 180 degrees from stdin and write the result to a file
+curl "https://example.com/internet-image.pbm" | pbmrotate -d=180 -o="internet-image-rotated.pbm"`
+
+	_, err := fmt.Fprintf(w, "Examples:\n\n%+20v\n", examples)
+	return err
 }
