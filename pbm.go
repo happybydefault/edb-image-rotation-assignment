@@ -13,9 +13,9 @@ import (
 
 var magicNumASCII = []byte("P1")
 
-// Flip writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
+// Rotate writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
 // returns a non-nil error.
-func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
+func Rotate(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	if image == nil {
 		return errors.New("image is nil")
 	}
@@ -133,9 +133,9 @@ func Flip(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	return nil
 }
 
-// FlipOptimized writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
+// RotateOptimized writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
 // returns a non-nil error.
-func FlipOptimized(output io.Writer, image io.Reader, degrees int, ccw bool) error {
+func RotateOptimized(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 	if image == nil {
 		return errors.New("image is nil")
 	}
