@@ -22,11 +22,11 @@ func main() {
 
 	flagSet := flag.NewFlagSet("pbmrotate", flag.ExitOnError)
 
-	flagSet.BoolVar(&printHelp, "h", false, "Print help")
+	flagSet.BoolVar(&printHelp, "h", false, "Print this help text")
 
 	flagSet.IntVar(&degrees, "d", 90, "Number of degrees. Possible values are only 90, 180, and 270")
 	flagSet.BoolVar(&ccw, "c", false, "Counterclockwise")
-	flagSet.StringVar(&filenameOut, "o", "", "Write to file instead of stdout")
+	flagSet.StringVar(&filenameOut, "o", "", "Write the result to file instead of stdout")
 
 	flagSet.Usage = func() {
 		fmt.Fprintf(flagSet.Output(), "\nUsage: %s [OPTIONS] FILE\n\nOptions:\n", flagSet.Name())

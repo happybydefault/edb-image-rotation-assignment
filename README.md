@@ -8,7 +8,7 @@ The details of the assignment are defined in [ASSIGNMENT.md](ASSIGNMENT.md).
 ## Install
 
 ```sh
-go install github.com/happybydefault/edb-image-rotation-assignment/cmd/...@latest
+go install github.com/happybydefault/edb-image-rotation-assignment/cmd/pbmrotate@latest
 ```
 
 ## Run
@@ -21,22 +21,22 @@ pbmrotate -h
 Usage: pbmrotate [OPTIONS] FILE
 
 Options:
-    -d      Number of degrees (default 90)
+    -d      Number of degrees. Possible values are only 90, 180, and 270 (default 90)
     -c      Counterclockwise
-    -o      Write to file instead of stdout
-    -h      Print help
+    -o      Write the result to file instead of stdout
+    -h      Print this help text
 ```
 
 ### Examples
 
 ```sh
-# Rotate an image 270 degrees clockwise and write to a file
+# Rotate an image 270 degrees clockwise and write the result to a file
 pbmrotate -d=270 -o="example-image-rotated.pbm" example-image.pbm
 
-# Rotate an image 90 degrees counterclockwise and write to stdout
+# Rotate an image 90 degrees counterclockwise and write the result to stdout
 pbmrotate -d=90 -c example-image.pbm
 
-# Rotate an image 180 degrees from stdin and write to a file
+# Rotate an image 180 degrees from stdin and write the result to a file
 curl "https://example.com/internet-image.pbm" | pbmrotate -d=180 -o="internet-image-rotated.pbm"
 ```
 
