@@ -33,7 +33,7 @@ func main() {
 		flagSet.PrintDefaults()
 	}
 
-	// on error, it executes flag set Usage() and exists (because of flag.ExitOnError)
+	// on error, it executes flag set Usage() and exits (because of flag.ExitOnError)
 	flagSet.Parse(os.Args[1:])
 
 	if printHelp {
