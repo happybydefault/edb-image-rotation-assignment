@@ -152,7 +152,7 @@ func RotateOptimized(output io.Writer, image io.Reader, degrees int, ccw bool) e
 		return fmt.Errorf("could not read magic number: %w", err)
 	}
 	if !bytes.Equal(magicNum, magicNumASCII) {
-		return fmt.Errorf("magic number does not correspond to an ASCII PBM file: %w", err)
+		return errors.New("magic number does not correspond to an ASCII PBM file")
 	}
 
 	var sizeStr string
