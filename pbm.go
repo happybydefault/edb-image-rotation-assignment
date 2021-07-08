@@ -97,13 +97,13 @@ loop:
 		heightStr := size[1]
 
 		widthN, err := strconv.Atoi(widthStr)
-		if err != nil {
+		if err != nil || widthN < 1 {
 			return fmt.Errorf("invalid width: %w", err)
 		}
 		width = widthN
 
 		heightN, err := strconv.Atoi(heightStr)
-		if err != nil {
+		if err != nil || heightN < 1 {
 			return fmt.Errorf("invalid height: %w", err)
 		}
 		height = heightN
