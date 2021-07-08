@@ -21,7 +21,7 @@ pbmrotate -h
 Usage: pbmrotate [OPTIONS] FILE
 
 Options:
-    -d      Number of degrees. Possible values are only 90, 180, and 270 (default 90)
+    -d      Number of degrees. It should be a multiple of a quarter turn (default 90)
     -c      Counterclockwise
     -o      Write the result to file instead of stdout
     -h      Print this help text

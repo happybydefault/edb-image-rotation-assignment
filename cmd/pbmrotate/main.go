@@ -23,7 +23,7 @@ func main() {
 
 	flagSet.BoolVar(&printHelp, "h", false, "Print this help text")
 
-	flagSet.IntVar(&degrees, "d", 90, "Number of degrees. Possible values are only 90, 180, and 270")
+	flagSet.IntVar(&degrees, "d", 90, "Number of degrees. It should be a multiple of a quarter turn")
 	flagSet.BoolVar(&ccw, "c", false, "Counterclockwise")
 	flagSet.StringVar(&resultName, "o", "", "Write the result to file instead of stdout")
 
