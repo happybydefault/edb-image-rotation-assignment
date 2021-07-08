@@ -7,23 +7,30 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strconv"
 	"strings"
 )
 
 var magicNumASCII = []byte("P1")
 
-// Rotate writes the rotated image of an ASCII encoded PBM to out. The degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
+// Rotate writes the rotated image of an ASCII encoded PBM to out. The number of degrees should be a multiple of a quarter turn (e.g. 90, 180, -270, etc.), otherwise it
 // returns a non-nil error.
 func Rotate(output io.Writer, image io.Reader, degrees int, ccw bool) error {
+	if output == nil {
+		return errors.New("output is nil")
+	}
+
 	if image == nil {
 		return errors.New("image is nil")
 	}
 
-	quarterTurn := 90
-	if degrees%quarterTurn > 0 {
-		return errors.New("number of degrees is not multiple of a quarter turn")
+	if degrees%90 > 0 {
+		return errors.New("number of degrees should be a multiple of a quarter turn")
 	}
+
+	rotations := degrees / 90 % 4
+	log.Printf("rotations: %v", rotations)
 
 	r := bufio.NewReader(image)
 	magicNum := make([]byte, 2)
