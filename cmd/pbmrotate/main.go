@@ -73,18 +73,24 @@ func run(inputName string, resultName string, degrees int, ccw bool) error {
 			return fmt.Errorf("could not open file %q: %s", inputName, err)
 		}
 		defer f.Close()
+
 		r = bufio.NewReader(f)
 	}
 
 	if resultName == "" {
-		w = bufio.NewWriter(os.Stdout)
+		buf := bufio.NewWriter(os.Stdout)
+		defer buf.Flush()
+		w = buf
 	} else {
 		f, err := os.Create(resultName)
 		if err != nil {
 			return fmt.Errorf("could not copy to file %q: %w", resultName, err)
 		}
 		defer f.Close()
-		w = bufio.NewWriter(f)
+
+		buf := bufio.NewWriter(f)
+		defer buf.Flush()
+		w = buf
 	}
 
 	err = pbm.Rotate(w, r, degrees, ccw)
