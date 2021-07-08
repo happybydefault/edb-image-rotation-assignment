@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -66,31 +65,25 @@ func run(inputName string, resultName string, degrees int, ccw bool) error {
 
 	pipe := stat.Mode()&os.ModeCharDevice != os.ModeCharDevice
 	if pipe {
-		r = bufio.NewReader(os.Stdin)
+		r = os.Stdin
 	} else {
 		f, err := os.Open(inputName)
 		if err != nil {
 			return fmt.Errorf("could not open file %q: %s", inputName, err)
 		}
 		defer f.Close()
-
-		r = bufio.NewReader(f)
+		r = f
 	}
 
 	if resultName == "" {
-		buf := bufio.NewWriter(os.Stdout)
-		defer buf.Flush()
-		w = buf
+		w = os.Stdout
 	} else {
 		f, err := os.Create(resultName)
 		if err != nil {
 			return fmt.Errorf("could not copy to file %q: %w", resultName, err)
 		}
 		defer f.Close()
-
-		buf := bufio.NewWriter(f)
-		defer buf.Flush()
-		w = buf
+		w = f
 	}
 
 	err = pbm.Rotate(w, r, degrees, ccw)
