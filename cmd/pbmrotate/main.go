@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
@@ -59,39 +59,32 @@ func run(inputName string, resultName string, degrees int, ccw bool) error {
 		w io.Writer
 	)
 
-	stdinInfo, err := os.Stdin.Stat()
+	stat, err := os.Stdin.Stat()
 	if err != nil {
 		return fmt.Errorf("could not get stats from stdin: %w", err)
 	}
 
-	isPipe := stdinInfo.Mode()&os.ModeNamedPipe == os.ModeNamedPipe
-	if isPipe {
-		r = os.Stdin
-	} else if inputName == "" || inputName == "-" {
-		buf := &bytes.Buffer{}
-		_, err := buf.ReadFrom(os.Stdin)
-		if err != nil {
-			return fmt.Errorf("could not read from stdin: %w", err)
-		}
-		r = buf
+	pipe := stat.Mode()&os.ModeCharDevice != os.ModeCharDevice
+	if pipe {
+		r = bufio.NewReader(os.Stdin)
 	} else {
 		f, err := os.Open(inputName)
 		if err != nil {
 			return fmt.Errorf("could not open file %q: %s", inputName, err)
 		}
 		defer f.Close()
-		r = f
+		r = bufio.NewReader(f)
 	}
 
 	if resultName == "" {
-		w = os.Stdout
+		w = bufio.NewWriter(os.Stdout)
 	} else {
 		f, err := os.Create(resultName)
 		if err != nil {
 			return fmt.Errorf("could not copy to file %q: %w", resultName, err)
 		}
 		defer f.Close()
-		w = f
+		w = bufio.NewWriter(f)
 	}
 
 	err = pbm.Rotate(w, r, degrees, ccw)
