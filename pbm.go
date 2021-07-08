@@ -25,7 +25,7 @@ func Rotate(output io.Writer, image io.Reader, degrees int, ccw bool) error {
 		return errors.New("image is nil")
 	}
 
-	if degrees%90 > 0 {
+	if degrees%90 != 0 {
 		return errors.New("number of degrees should be a multiple of a quarter turn")
 	}
 
