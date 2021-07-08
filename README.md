@@ -39,9 +39,3 @@ pbmrotate -d=90 -c example-image.pbm
 # Rotate an image 180 degrees from stdin and write the result to a file
 curl "https://example.com/internet-image.pbm" | pbmrotate -d=180 -o="internet-image-rotated.pbm"
 ```
-
-## Docker
-
-```sh
-docker pull ghcr.io/happybydefault/pbmrotate
-```
