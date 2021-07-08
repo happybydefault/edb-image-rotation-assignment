@@ -158,6 +158,36 @@ func TestRotate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "assignment example, 0 degrees clockwise",
+			args: args{
+				image:   strings.NewReader(image),
+				degrees: 0,
+				ccw:     false,
+			},
+			want:    image,
+			wantErr: false,
+		},
+		{
+			name: "assignment example, 360 degrees counterclockwise",
+			args: args{
+				image:   strings.NewReader(image),
+				degrees: 360,
+				ccw:     true,
+			},
+			want:    image,
+			wantErr: false,
+		},
+		{
+			name: "assignment example, 123 degrees clockwise",
+			args: args{
+				image:   strings.NewReader(image),
+				degrees: 123,
+				ccw:     false,
+			},
+			want:    "",
+			wantErr: true,
+		},
+		{
 			name: "assignment example with invalid size, 90 degrees clockwise",
 			args: args{
 				image:   strings.NewReader(imageInvalidSize),
